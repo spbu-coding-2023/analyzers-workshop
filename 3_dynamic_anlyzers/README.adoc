@@ -1,0 +1,37 @@
+= Пришло время запустить программу
+
+После того, как мы исправили код в соответствие с предупреждениями компилятора и статических анализаторов, в программе всё равно могли остаться ошибки.
+Мы можем поискать их, используя динамические анализаторы.
+
+В языках с ручным управлением памятью может быть большое количество ошибок при работе с памятью: переполнение буфера, утечки памяти, повторное освобождение и другие.
+
+В многопоточных программах могут встретиться гонки данных  (несинхронизированные обращения к данным) и дедлоки.
+
+Мы рассмотрим такие динамические анализаторы как https://github.com/google/sanitizers[санитайзеры] и https://valgrind.org/[Valgrind].
+
+Для работы санитайзеров требуется скомпилировать программу с опцией `-fsanitize=<нужный санитайзер>` (поддерживается не всеми компиляторами).
+Это нужно для инструментирования кода.
+Подробно посмотреть как работают санитайзеры можно в Wiki официального репозитория, также рекомендую посмотреть https://www.youtube.com/watch?v=7WyBAUJ8UA8[этот доклад].
+
+Какие бывают санитайзеры:
+
+* https://github.com/google/sanitizers/wiki/AddressSanitizer[AddressSanitizer(ASan)] --
+обнаруживает проблемы с адресацией, и https://github.com/google/sanitizers/wiki/AddressSanitizerLeakSanitizer[LeakSanitizer] --
+обнаруживает утечки памяти
+* https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html[Hardware-assisted AddressSanitizer (HWASAN)] --
+новый вариант AddressSanitizer, который опирается на возможности архитектуры, что позволяет уменьшить потребление памяти
+* https://github.com/google/sanitizers/wiki/ThreadSanitizerCppManual[ThreadSanitizer(TSan)] -- обнаруживает гонки данных и дедлоки
+* https://github.com/google/sanitizers/wiki/MemorySanitizer[MemorySanitizer(MSan)] -- обнаруживает использование неинициализированной памяти
+* https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html[UndefinedBehaviorSanitizer(UBSan)] -- обнаруживает непределённое поведение
+
+Подробнее о том, какие санитайзеры поддерживают компиляторы читайте в документации к 
+https://clang.llvm.org/docs/UsersManual.html#controlling-code-generation[clang] и
+https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html[gcc]
+
+Valgrind для работы не требует перекомпиляции программы и может помочь изучить любой исполняемый файл.
+Однако его отчёты будут гораздо понятнее, если программа скомпилирована с отладочной информацией.
+Valgrind состоит из нескольких инструментов для детектирования ошибок:
+
+* Memcheck -- детектор ошибок памяти и утечек
+* Helgrind -- детектор ошибок синхронизации
+* DRD  -- детектор ошибок многопоточности
